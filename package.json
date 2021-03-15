@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/josuedavidgodinez/FIX-IT-BACKEND#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "mongo-client": "^0.2.1"
   }
 }
