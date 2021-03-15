@@ -1,0 +1,22 @@
+{
+  "name": "fix-it-backend",
+  "version": "1.0.0",
+  "description": "Backend para proyecto de fix-it",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/josuedavidgodinez/FIX-IT-BACKEND.git"
+  },
+  "author": "Josue Godinez Gudiel",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/josuedavidgodinez/FIX-IT-BACKEND/issues"
+  },
+  "homepage": "https://github.com/josuedavidgodinez/FIX-IT-BACKEND#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
