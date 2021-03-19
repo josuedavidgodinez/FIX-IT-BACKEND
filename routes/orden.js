@@ -5,17 +5,121 @@ const functions=require('../functions/functions')
 
 router.get('/', async (req, res) => {
     try {
-        const collection = mongo._db.collection("Ordenes");
-        var query = { user : "jogodine" };
+        const collection = mongo._db.collection("Ordenes");       
 
-        collection.find(query).toArray(function(err, result) {
+        collection.find().toArray(function(err, result) {
             if (err) throw err;
             mongo._db.close();
             return res.status(200).json(result)
           });      
 
+    } catch (error) {
+        console.log(error)
+        mongo._db.close();
+        return res.status(500).json(error);
+
+    }
+
+})
+
+router.get('/:id', async (req, res) => {
+    try {
+        const id=req.params.id
+        const collection = mongo._db.collection("Ordenes");
+        console.log(id)        
+        const query = { _id : parseInt(id) };
+
+        collection.find(query).toArray(function(err, result) {
+            if (err) throw err;
+
+            mongo._db.close();
+            if (result.length==0){
+                return res.status(404).json("Not found")
+            }else{
+                return res.status(200).json(result[0])
+            }
+            
+          });     
+          
+    } catch (error) {
+        console.log(error)
+        mongo._db.close();
+        return res.status(500).json(error);
+
+    }
+
+})
 
 
+router.delete('/:id', async (req, res) => {
+    try {
+        const id=req.params.id
+        const collection = mongo._db.collection("Ordenes");
+        const query = { _id : parseInt(id) };
+
+        collection.find(query).toArray(function(err, result) {
+            if (err) throw err;
+            if (result.length==0){
+                mongo._db.close();
+                return res.status(404).json("Not found")
+            }else{
+                collection.remove(query,function(err, delOK) {
+                    if (err) {
+                        mongo._db.close();
+                        return res.status(500).json(err);                        
+                    };
+                    if (delOK){
+                        mongo._db.close();
+                        return res.status(204).json("Document deleted");   
+                    } 
+                  });
+            }
+            
+          });     
+          
+    } catch (error) {
+        console.log(error)
+        mongo._db.close();
+        return res.status(500).json(error);
+
+    }
+
+})
+
+router.put('/:id', async (req, res) => {
+    try {
+        const id=req.params.id
+        const collection = mongo._db.collection("Ordenes");
+        const query = { _id : parseInt(id) };
+        const update = {
+            "$push": {
+            
+                "user": req.body.user,
+                "Repuestos" : req.body.Repuestos,
+                "Total" : req.body.Total,
+            }
+          };
+          console.log(req.body)
+        collection.find(query).toArray(function(err, result) {
+            if (err) throw err;
+            if (result.length==0){
+                mongo._db.close();
+                return res.status(404).json("Not found")
+            }else{
+                collection.update(query,update,function(err, delOK) {
+                    if (err) {
+                        mongo._db.close();
+                        return res.status(500).json(err);                        
+                    };
+                    if (delOK){
+                        mongo._db.close();
+                        return res.status(204).json("Document updated");   
+                    } 
+                  });
+            }
+            
+          });     
+          
     } catch (error) {
         console.log(error)
         mongo._db.close();
@@ -43,23 +147,15 @@ router.post('/', async (req, res) => {
             if(err) {
                 console.log(err)
                 mongo._db.close();
-                return res.status(500).json(err);
-                
+                return res.status(500).json(err);               
             }else{
-
             mongo._db.close();
-            return res.status(200).json(result);
-                   
-                    
+            return res.status(201).json(result);                 
                
             }
         
-        } )  
-        
-        
-
-
-
+        } ) 
+    
     } catch (error) {
         console.log(error)
         mongo._db.close();
