@@ -2,8 +2,10 @@ const express = require('express')
 const router = express.Router()
 const mongo =require('../connections/db')
 const functions=require('../functions/functions')
+const autenticacion = require('./autenticacion')
 
-router.get('/', async (req, res) => {
+
+router.get('/',autenticacion, async (req, res) => {
     try {
         const collection = mongo._db.collection("Ordenes");       
 
@@ -22,7 +24,7 @@ router.get('/', async (req, res) => {
 
 })
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', autenticacion,async (req, res) => {
     try {
         const id=req.params.id
         const collection = mongo._db.collection("Ordenes");
@@ -51,7 +53,7 @@ router.get('/:id', async (req, res) => {
 })
 
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id',autenticacion, async (req, res) => {
     try {
         const id=req.params.id
         const collection = mongo._db.collection("Ordenes");
@@ -86,7 +88,7 @@ router.delete('/:id', async (req, res) => {
 
 })
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', autenticacion,async (req, res) => {
     try {
         const id=req.params.id
         const collection = mongo._db.collection("Ordenes");
@@ -129,7 +131,7 @@ router.put('/:id', async (req, res) => {
 
 })
 
-router.post('/', async (req, res) => {
+router.post('/',autenticacion, async (req, res) => {
     try {
         const collection = mongo._db.collection("Ordenes");
         let doc
