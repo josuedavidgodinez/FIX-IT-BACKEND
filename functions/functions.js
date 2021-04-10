@@ -1,13 +1,13 @@
 const express = require('express')
 const router = express.Router()
-const mongo = require('../connections/db')
+const connect = require('../connections/db')
 
 
 let Obtener_secuencial = function (_coleccion) {
-  return new Promise( function (resolve, reject){
+  return new Promise( async function (resolve, reject){
     try {
-
-      const collection = mongo._db.collection("Secuencial");
+      const _db = await connect()
+      const collection = _db.collection("Secuencial");
 
 
       collection.findAndModify(
@@ -31,10 +31,10 @@ let Obtener_secuencial = function (_coleccion) {
 
 
 let Buscar_usuario = function (_coleccion) {
-  return new Promise( function (resolve, reject){
+  return new Promise( async function (resolve, reject){
     try {
-
-      const collection = mongo._db.collection("Secuencial");
+      const _db = await connect()
+      const collection = _db.collection("Secuencial");
 
 
       collection.findAndModify(

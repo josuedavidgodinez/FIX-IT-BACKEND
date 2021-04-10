@@ -8,7 +8,6 @@ rutasProtegidas.use((req, res, next) => {
 
 
    
-    console.log(config.llave)
     if (token) {
       jwt.verify(token, config.llave, (err, decoded) => {    
          
