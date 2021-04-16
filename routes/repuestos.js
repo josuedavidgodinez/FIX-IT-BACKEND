@@ -4,12 +4,11 @@ const connect =require('../connections/db')
 const functions=require('../functions/functions')
 const autenticacion = require('./autenticacion')
 
-
 router.get('/',autenticacion, async (req, res) => {
     try {
         const _db = await connect()
 
-        const collection = _db.collection("Ordenes");       
+        const collection = _db.collection("Repuestos");       
 
         collection.find().toArray(function(err, result) {
             if (err) throw err;
@@ -30,7 +29,7 @@ router.get('/:id', autenticacion,async (req, res) => {
     try {
         const _db = await connect()
         const id=req.params.id
-        const collection = _db.collection("Ordenes");
+        const collection = _db.collection("Repuestos");
         const query = { _id : parseInt(id) };
 
         collection.find(query).toArray(function(err, result) {
@@ -60,7 +59,7 @@ router.delete('/:id',autenticacion, async (req, res) => {
         const _db = await connect()
 
         const id=req.params.id
-        const collection = _db.collection("Ordenes");
+        const collection = _db.collection("Repuestos");
         const query = { _id : parseInt(id) };
 
         collection.find(query).toArray(function(err, result) {
@@ -97,17 +96,16 @@ router.put('/:id', autenticacion,async (req, res) => {
         const _db = await connect()
 
         const id=req.params.id
-        const collection = _db.collection("Ordenes");
+        const collection = _db.collection("Repuestos");
         const query = { _id : parseInt(id) };
         const update = {
             "$set": {
             
-                "user": req.body.user,
-                "Repuestos" : req.body.Repuestos,
-                "Total" : req.body.Total,
-                "Direccion_Entrega" : req.body.dir_entrega,
-                "Direccion_Facturacion" : req.body.dir_factura,
-                "Estado" : req.body.estado
+                "codigo":req.body.codigo,
+                "nombre":req.body.nombre,
+                "precio":req.body.precio,
+                "img":req.body.img,
+                "precio_oferta":req.body.precio_oferta
             }
           };
         collection.find(query).toArray(function(err, result) {
@@ -143,20 +141,19 @@ router.post('/',autenticacion, async (req, res) => {
     try {
         const _db = await connect()
 
-        const collection = _db.collection("Ordenes");
+        const collection = _db.collection("Repuestos");
         let doc
-       doc= await functions.Obtener_secuencial("Ordenes") 
+       doc= await functions.Obtener_secuencial("Repuestos") 
         console.log(doc.secuencial)
         console.log(req.body.user)
         collection.insert({
-            "_id" :  doc.secuencial ,
-            "user": req.body.user,
-            "Repuestos" : req.body.Repuestos,
-            "Total" : req.body.Total,
-            "Direccion_Entrega" : req.body.dir_entrega,
-            "Direccion_Facturacion" : req.body.dir_factura,
-            "Estado" : req.body.estado
 
+            "_id":  doc.secuencial,
+            "codigo":req.body.codigo,
+            "nombre":req.body.nombre,
+            "img":req.body.img,
+            "precio":req.body.precio,
+            "precio_oferta":req.body.precio_oferta
         },
         function(err, result) {
            
@@ -183,4 +180,3 @@ router.post('/',autenticacion, async (req, res) => {
 
 
 module.exports = router
-
