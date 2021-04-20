@@ -8,6 +8,7 @@ app.use(express.json());
 
 const ordenesRoute = require('./routes/orden')
 const repuestosRoute = require('./routes/repuestos')
+const usuarios = require('./routes/users')
 
 const Login = require('./routes/login')
 
@@ -20,6 +21,7 @@ app.use(function(req, res, next) {
 app.use('/repuesto',repuestosRoute)
 app.use('/orden',ordenesRoute)
 app.use('/login',Login)
+app.use('/users',usuarios)
 
 app.use(express.static('public'))
 

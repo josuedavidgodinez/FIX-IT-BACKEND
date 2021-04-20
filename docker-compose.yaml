@@ -1,0 +1,18 @@
+version: '3.4'
+services: 
+    api:
+        container_name: fix-it-backend
+        restart: always
+        build: .
+        ports: 
+            - '3600:3600'
+        links: 
+            - mongodb
+    mongodb:
+        container_name: mongo-fix-it
+        image: mongo
+        volumes:
+            - ./data:/data/db
+        ports: 
+            - '27017:27017'
+

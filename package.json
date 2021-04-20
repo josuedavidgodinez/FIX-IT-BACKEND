@@ -8,6 +8,9 @@
     "start": "node server.js",
     "dev": "nodemon server.js"
   },
+  "env": {
+    "NODE_ENV": "development"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/josuedavidgodinez/FIX-IT-BACKEND.git"
