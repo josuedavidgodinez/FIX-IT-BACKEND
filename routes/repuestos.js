@@ -4,30 +4,13 @@ const connect =require('../connections/db')
 const functions=require('../functions/functions')
 const autenticacion = require('./autenticacion')
 
-router.get('/',autenticacion, async (req, res) => {
-    try {
-        const _db = await connect()
 
-        const collection = _db.collection("Repuestos");       
-
-        collection.find().toArray(function(err, result) {
-            if (err) throw err;
-            _db.close();
-            return res.status(200).json(result)
-          });      
-
-    } catch (error) {
-        console.log(error)
-        _db.close();
-        return res.status(500).json(error);
-
-    }
-
-})
 
 router.get('/:id', autenticacion,async (req, res) => {
     try {
-        const _db = await connect()
+        const db=await connect()    
+        const _db=db.db("DB_FIX_IT")
+
         const id=req.params.id
         const collection = _db.collection("Repuestos");
         const query = { _id : parseInt(id) };
@@ -35,7 +18,7 @@ router.get('/:id', autenticacion,async (req, res) => {
         collection.find(query).toArray(function(err, result) {
             if (err) throw err;
 
-            _db.close();
+            db.close();
             if (result.length==0){
                 return res.status(404).json("Not found")
             }else{
@@ -46,7 +29,7 @@ router.get('/:id', autenticacion,async (req, res) => {
           
     } catch (error) {
         console.log(error)
-        _db.close();
+        db.close();
         return res.status(500).json(error);
 
     }
@@ -56,7 +39,8 @@ router.get('/:id', autenticacion,async (req, res) => {
 
 router.delete('/:id',autenticacion, async (req, res) => {
     try {
-        const _db = await connect()
+        const db=await connect()    
+        const _db=db.db("DB_FIX_IT")
 
         const id=req.params.id
         const collection = _db.collection("Repuestos");
@@ -65,16 +49,16 @@ router.delete('/:id',autenticacion, async (req, res) => {
         collection.find(query).toArray(function(err, result) {
             if (err) throw err;
             if (result.length==0){
-                _db.close();
+                db.close();
                 return res.status(404).json("Not found")
             }else{
                 collection.remove(query,function(err, delOK) {
                     if (err) {
-                        _db.close();
+                        db.close();
                         return res.status(500).json(err);                        
                     };
                     if (delOK){
-                        _db.close();
+                        db.close();
                         return res.status(204).json("Document deleted");   
                     } 
                   });
@@ -84,7 +68,7 @@ router.delete('/:id',autenticacion, async (req, res) => {
           
     } catch (error) {
         console.log(error)
-        _db.close();
+        db.close();
         return res.status(500).json(error);
 
     }
@@ -93,7 +77,8 @@ router.delete('/:id',autenticacion, async (req, res) => {
 
 router.put('/:id', autenticacion,async (req, res) => {
     try {
-        const _db = await connect()
+        const db=await connect()    
+        const _db=db.db("DB_FIX_IT")
 
         const id=req.params.id
         const collection = _db.collection("Repuestos");
@@ -111,16 +96,16 @@ router.put('/:id', autenticacion,async (req, res) => {
         collection.find(query).toArray(function(err, result) {
             if (err) throw err;
             if (result.length==0){
-                _db.close();
+                db.close();
                 return res.status(404).json("Not found")
             }else{
                 collection.update(query,update,function(err, delOK) {
                     if (err) {
-                        _db.close();
+                        db.close();
                         return res.status(500).json(err);                        
                     };
                     if (delOK){
-                        _db.close();
+                        db.close();
                         return res.status(204).json("Document updated");   
                     } 
                   });
@@ -130,7 +115,7 @@ router.put('/:id', autenticacion,async (req, res) => {
           
     } catch (error) {
         console.log(error)
-        _db.close();
+        db.close();
         return res.status(500).json(error);
 
     }
@@ -139,16 +124,16 @@ router.put('/:id', autenticacion,async (req, res) => {
 
 router.post('/',autenticacion, async (req, res) => {
     try {
-        const _db = await connect()
+        const db=await connect()    
+        const _db=db.db("DB_FIX_IT")
 
         const collection = _db.collection("Repuestos");
         let doc
        doc= await functions.Obtener_secuencial("Repuestos") 
-        console.log(doc.secuencial)
-        console.log(req.body.user)
-        collection.insert({
+       
+        collection.insertOne({
 
-            "_id":  doc.secuencial,
+            "_id":  doc.value.secuencial,
             "codigo":req.body.codigo,
             "nombre":req.body.nombre,
             "img":req.body.img,
@@ -159,10 +144,10 @@ router.post('/',autenticacion, async (req, res) => {
            
             if(err) {
                 console.log(err)
-                _db.close();
+                db.close();
                 return res.status(500).json(err);               
             }else{
-            _db.close();
+                db.close();
             return res.status(201).json(result);                 
                
             }
@@ -171,7 +156,7 @@ router.post('/',autenticacion, async (req, res) => {
     
     } catch (error) {
         console.log(error)
-        _db.close();
+        db.close();
         return res.status(500).json(error);
 
     }

@@ -11,7 +11,11 @@ app.set('llave', config.llave);
 
 router.post('/', async (req, res) => {
     try {
-        const _db = await connect()
+        const db=await connect()      
+        console.log(db) 
+        const _db=db.db("DB_FIX_IT")
+        
+        
 
         const collection = _db.collection("Usuarios");
         collection.insert({

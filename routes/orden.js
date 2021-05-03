@@ -5,21 +5,49 @@ const functions=require('../functions/functions')
 const autenticacion = require('./autenticacion')
 
 
-router.get('/',autenticacion, async (req, res) => {
+router.get('/:user',autenticacion, async (req, res) => {
     try {
-        const _db = await connect()
+        const user = req.params.user
+        const db=await connect()    
+        const _db=db.db("DB_FIX_IT")
 
-        const collection = _db.collection("Ordenes");       
-
-        collection.find().toArray(function(err, result) {
+        const collection = _db.collection("Ordenes").aggregate([
+            { "$match":
+                {'user': user } },
+            // Unwind the source
+            { "$unwind": "$Repuestos" },
+            // Do the lookup matching
+            { "$lookup": {
+               "from": "Repuestos",
+               "localField": "Repuestos",
+               "foreignField": "_id",
+               "as": "repuestosObjects"
+            }},
+            // Unwind the result arrays ( likely one or none )
+            { "$unwind": "$repuestosObjects" },
+            // Group back to arrays
+            { "$group": {
+                "_id": "$_id",
+                "user": {"$first" : "$user"},
+                "Total": {"$first" :"$Total"},
+                "Direccion_Entrega": {"$first" :"$Direccion_Entrega"},
+                "Direccion_Facturacion": {"$first" :"$Direccion_Facturacion"},
+                "Estado": {"$first" :"$Estado"},                
+                "repuestos": { "$push": "$Repuestos" },
+                "repuestosObjects": { "$push": "$repuestosObjects" }
+            }}
+        ]).toArray(function(err, result) {
             if (err) throw err;
-            _db.close();
+            db.close();
+            
             return res.status(200).json(result)
-          });      
+          });       
+
+    
 
     } catch (error) {
         console.log(error)
-        _db.close();
+        db.close();
         return res.status(500).json(error);
 
     }
@@ -28,26 +56,47 @@ router.get('/',autenticacion, async (req, res) => {
 
 router.get('/:id', autenticacion,async (req, res) => {
     try {
-        const _db = await connect()
-        const id=req.params.id
-        const collection = _db.collection("Ordenes");
-        const query = { _id : parseInt(id) };
+        const id =  parseInt(req.params.id)
+        const db=await connect()    
+        const _db=db.db("DB_FIX_IT")
 
-        collection.find(query).toArray(function(err, result) {
+        const collection = _db.collection("Ordenes").aggregate([
+            { "$match":
+                {'_id': id } },
+            // Unwind the source
+            { "$unwind": "$Repuestos" },
+            // Do the lookup matching
+            { "$lookup": {
+               "from": "Repuestos",
+               "localField": "Repuestos",
+               "foreignField": "_id",
+               "as": "repuestosObjects"
+            }},
+            // Unwind the result arrays ( likely one or none )
+            { "$unwind": "$repuestosObjects" },
+            // Group back to arrays
+            { "$group": {
+                "_id": "$_id",
+                "user": {"$first" : "$user"},
+                "Total": {"$first" :"$Total"},
+                "Direccion_Entrega": {"$first" :"$Direccion_Entrega"},
+                "Direccion_Facturacion": {"$first" :"$Direccion_Facturacion"},
+                "Estado": {"$first" :"$Estado"},                
+                "repuestos": { "$push": "$Repuestos" },
+                "repuestosObjects": { "$push": "$repuestosObjects" }
+            }}
+        ]).toArray(function(err, result) {
             if (err) throw err;
+            db.close();
+            if(result.length===0) return res.status(404).json("Not found")            
+            return res.status(200).json(result[0])
+          });       
 
-            _db.close();
-            if (result.length==0){
-                return res.status(404).json("Not found")
-            }else{
-                return res.status(200).json(result[0])
-            }
-            
-          });     
-          
+    
+
     } catch (error) {
         console.log(error)
-        _db.close();
+        db.close();
         return res.status(500).json(error);
 
     }
@@ -57,7 +106,8 @@ router.get('/:id', autenticacion,async (req, res) => {
 
 router.delete('/:id',autenticacion, async (req, res) => {
     try {
-        const _db = await connect()
+        const db=await connect()    
+        const _db=db.db("DB_FIX_IT")
 
         const id=req.params.id
         const collection = _db.collection("Ordenes");
@@ -66,16 +116,16 @@ router.delete('/:id',autenticacion, async (req, res) => {
         collection.find(query).toArray(function(err, result) {
             if (err) throw err;
             if (result.length==0){
-                _db.close();
+                db.close();
                 return res.status(404).json("Not found")
             }else{
-                collection.remove(query,function(err, delOK) {
+                collection.deleteOne(query,function(err, delOK) {
                     if (err) {
-                        _db.close();
+                        db.close();
                         return res.status(500).json(err);                        
                     };
                     if (delOK){
-                        _db.close();
+                        db.close();
                         return res.status(204).json("Document deleted");   
                     } 
                   });
@@ -85,7 +135,7 @@ router.delete('/:id',autenticacion, async (req, res) => {
           
     } catch (error) {
         console.log(error)
-        _db.close();
+        db.close();
         return res.status(500).json(error);
 
     }
@@ -94,7 +144,8 @@ router.delete('/:id',autenticacion, async (req, res) => {
 
 router.put('/:id', autenticacion,async (req, res) => {
     try {
-        const _db = await connect()
+        const db=await connect()    
+        const _db=db.db("DB_FIX_IT")
 
         const id=req.params.id
         const collection = _db.collection("Ordenes");
@@ -113,16 +164,16 @@ router.put('/:id', autenticacion,async (req, res) => {
         collection.find(query).toArray(function(err, result) {
             if (err) throw err;
             if (result.length==0){
-                _db.close();
+                db.close();
                 return res.status(404).json("Not found")
             }else{
-                collection.update(query,update,function(err, delOK) {
+                collection.updateOne(query,update,function(err, delOK) {
                     if (err) {
-                        _db.close();
+                        db.close();
                         return res.status(500).json(err);                        
                     };
                     if (delOK){
-                        _db.close();
+                        db.close();
                         return res.status(204).json("Document updated");   
                     } 
                   });
@@ -132,7 +183,7 @@ router.put('/:id', autenticacion,async (req, res) => {
           
     } catch (error) {
         console.log(error)
-        _db.close();
+        db.close();
         return res.status(500).json(error);
 
     }
@@ -141,18 +192,18 @@ router.put('/:id', autenticacion,async (req, res) => {
 
 router.post('/',autenticacion, async (req, res) => {
     try {
-        const _db = await connect()
+        const db=await connect()    
+        const _db=db.db("DB_FIX_IT")
 
         const collection = _db.collection("Ordenes");
         let doc
        doc= await functions.Obtener_secuencial("Ordenes") 
-        console.log(doc.secuencial)
-        console.log(req.body.user)
-        collection.insert({
-            "_id" :  doc.secuencial ,
+        
+        collection.insertOne({
+            "_id" :  doc.value.secuencial ,
             "user": req.body.user,
             "Repuestos" : req.body.Repuestos,
-            "Total" : req.body.Total,
+            "Total" : Math.round(req.body.Total * 100) / 100,
             "Direccion_Entrega" : req.body.dir_entrega,
             "Direccion_Facturacion" : req.body.dir_factura,
             "Estado" : req.body.estado
@@ -162,10 +213,10 @@ router.post('/',autenticacion, async (req, res) => {
            
             if(err) {
                 console.log(err)
-                _db.close();
+                db.close();
                 return res.status(500).json(err);               
             }else{
-            _db.close();
+            db.close();
             return res.status(201).json(result);                 
                
             }
@@ -174,7 +225,7 @@ router.post('/',autenticacion, async (req, res) => {
     
     } catch (error) {
         console.log(error)
-        _db.close();
+        db.close();
         return res.status(500).json(error);
 
     }

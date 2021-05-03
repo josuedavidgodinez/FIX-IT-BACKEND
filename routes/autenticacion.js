@@ -3,10 +3,9 @@ const  jwt = require('jsonwebtoken');
 const config = require('../configs/configs');
 
 const rutasProtegidas = express.Router(); 
+
 rutasProtegidas.use((req, res, next) => {
     const token = req.headers['access-token'];
-
-
    
     if (token) {
       jwt.verify(token, config.llave, (err, decoded) => {    

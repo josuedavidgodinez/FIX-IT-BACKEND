@@ -1,13 +1,5 @@
 version: '3.4'
-services: 
-    front-end:
-        container_name: fix-it-frontend
-        restart: always
-        build: ../fix-it/.
-        ports: 
-            - '8000:3000'
-        links: 
-            - api
+services:     
 
     api:
         container_name: fix-it-backend
@@ -17,7 +9,6 @@ services:
             - '3600:3600'
         links: 
             - mongodb
-
 
 
     mongodb:

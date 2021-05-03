@@ -6,16 +6,17 @@ const connect = require('../connections/db')
 let Obtener_secuencial = function (_coleccion) {
   return new Promise( async function (resolve, reject){
     try {
-      const _db = await connect()
+      const db=await connect()    
+        const _db=db.db("DB_FIX_IT")
       const collection = _db.collection("Secuencial");
 
 
-      collection.findAndModify(
+      collection.findOneAndUpdate(
         { "coleccion": _coleccion },
-        [["coleccion", 1]],
         { "$inc": { "secuencial": 1 } },
-        { new: true },
+        { new: true  , upsert: true, returnOriginal: false},
         function (err, doc) {
+          console.log(doc)
           resolve(doc)
         }
       );
@@ -30,31 +31,6 @@ let Obtener_secuencial = function (_coleccion) {
 }
 
 
-let Buscar_usuario = function (_coleccion) {
-  return new Promise( async function (resolve, reject){
-    try {
-      const _db = await connect()
-      const collection = _db.collection("Secuencial");
-
-
-      collection.findAndModify(
-        { "coleccion": _coleccion },
-        [["coleccion", 1]],
-        { "$inc": { "secuencial": 1 } },
-        { new: true },
-        function (err, doc) {
-          resolve(doc)
-        }
-      );
-
-    } catch (error) {
-      reject(error)
-      return -1
-
-    }
-
-  });
-}
 
 
 

@@ -102,3 +102,6 @@ dist
 
 # TernJS port file
 .tern-port
+
+#string de conexion y clave de token
+.configs

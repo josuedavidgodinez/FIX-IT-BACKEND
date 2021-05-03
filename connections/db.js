@@ -1,36 +1,43 @@
 const mongo_client = require('mongodb').MongoClient;
 assert = require('assert');
+const config = require('../configs/configs');
 
 connect = async ()=>{
+    try{
     return new Promise ((resolve,reject)=>{
-        let connection_string 
+        try{
+        let connection_string     
 
-        const ambiente=process.env.NODE_ENV
+        
+    
+        connection_string = config.string_conexion
 
-        console.log(ambiente)
-        if(ambiente=="produccion")
-        {
-            connection_string = 'mongodb://mongodb:27017/DB_FIX_IT'
+        const client = new mongo_client(connection_string);
 
-        }else{
-            connection_string = 'mongodb://localhost:27017/DB_FIX_IT'
-        }
-
-        mongo_client.connect(connection_string,
-        (err, client) => {
-            assert.equal(null, err);
-            assert.ok(client != null);      
+        client.connect(
+        (err) => {               
             if(err){
+                console.log(err)
                 return reject('error : ' + err)
             }     
             console.log('Conect to database')
+           
             return resolve(client)
            
     
         } 
  
 )
+    }catch(ex){
+        return reject('error : ' + ex)
+    }
 })
+    }catch(ex){
+
+        console.log(ex)
+        
+        return res.status(500).json(ex);
+    }
 }
 
 
