@@ -104,4 +104,4 @@ dist
 .tern-port
 
 #string de conexion y clave de token
-.configs
+configs/
